@@ -36,4 +36,15 @@
       </div>
     </div>
   </div>
+  <form method="POST" action="">
+			{{ form.hidden_tag() }}
+			<div class="form-group">
+				<input type="submit" name="Submit" value="Predict">
+			</div>	
+  </form>
+  {% if input_pred %}
+    <h2>{{input_pred}}</h2><br>
+    <h4>News bot is {{confidence}}% confident news is real</h4>
+  {% endif %}
+
 {% endblock content %}

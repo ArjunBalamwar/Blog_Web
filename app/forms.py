@@ -56,6 +56,9 @@ class UpdateAccountForm(FlaskForm):
 
 class PostForm(FlaskForm):
 	title = StringField('Title',
-                           validators=[DataRequired(), Length(min=2, max=50)])
+                           validators=[DataRequired(), Length(min=2, max=100)])
 	content= TextAreaField('content',validators=[DataRequired()])
 	submit = SubmitField('Post') 
+
+class CheckPostForm(FlaskForm):
+    submit = SubmitField('Predict') 

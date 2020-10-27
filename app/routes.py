@@ -3,16 +3,15 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from app import app,db,bcrypt
-from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
+from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, CheckPostForm
 
 from app.models import User,Post
 from flask_login import login_user, current_user, logout_user, login_required
 
-
-
-
-
-
+import pickle
+from nltk.stem.porter import PorterStemmer
+from nltk.corpus import stopwords
+import re
 
 
 @app.route('/')
@@ -105,10 +104,30 @@ def new_post():
 		return redirect(url_for('home'))
 	return render_template('create_post.html', title='New Post', form=form, legend='New Post' )
 
-@app.route('/post/<int:post_id>')
+@app.route('/post/<int:post_id>', methods=['GET','POST'])
 def post(post_id):
 	post=Post.query.get_or_404(post_id)
-	return render_template('post.html', title=post.title, post=post )
+	form = CheckPostForm()
+	if form.validate_on_submit():
+		model = pickle.load(open("classifier.sav", "rb"))
+		vector = pickle.load(open("countvector.pkl", "rb"))
+		#preprocess the string
+		text = re.sub( "[^a-zA-Z']", ' ', post.title ).lower().split()
+		reverse = ["not", "isn't", "wasn't", "won't", "don't", "n't", "can't", "couldn't", "wouldn't"]
+		custom_stop = [word for word in stopwords.words('english') if word not in reverse]
+		text = [PorterStemmer().stem(word) for word in text if word not in custom_stop]
+		text = ' '.join(text)
+		print(text)
+		input_data = vector.transform([text]).toarray()
+		confidence = round(model.predict_proba(input_data)[0][0]*100, 2)
+		if model.predict(input_data) == 1:
+			input_pred = f"FAKE"
+		else:
+			input_pred = f"REAL"
+		
+		return render_template('post.html', title=post.title, post=post, form = form, input_pred=input_pred, confidence=confidence)
+	return render_template('post.html', title=post.title, post=post, form = form)
+
 
 @app.route('/post/<int:post_id>/update', methods=['GET','POST'])
 @login_required
@@ -138,3 +157,5 @@ def delete_post(post_id):
 	db.session.commit()
 	flash('Your post has been deleted !', 'success')	
 	return redirect(url_for('home'))
+
+
