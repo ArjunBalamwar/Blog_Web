@@ -97,7 +97,7 @@ def account():
 def new_post():
 	form=PostForm()
 	if form.validate_on_submit():
-		post= Post(title=form.title.data, content=form.content.data, author=current_user)
+		post= Post(title=form.title.data, content=form.content.data, category=form.category.data, author=current_user)
 		db.session.add(post)
 		db.session.commit()
 		flash('Your Post has been created !','success')
@@ -139,6 +139,7 @@ def update_post(post_id):
 	if form.validate_on_submit():
 		post.title = form.title.data
 		post.content= form.content.data
+		post.category = form.category.data
 		db.session.commit()
 		flash('Your Post has been updated!','success')
 		return redirect(url_for('post',post_id=post.id))
@@ -157,5 +158,23 @@ def delete_post(post_id):
 	db.session.commit()
 	flash('Your post has been deleted !', 'success')	
 	return redirect(url_for('home'))
+
+@app.route('/entertainment')
+def categorye():
+	posts=Post.query.filter_by(category='Entertainment').all()
+	return render_template('home.html', posts=posts)	
+
+@app.route('/music')
+def categorym():
+	posts=Post.query.filter_by(category='Music').all()
+	return render_template('home.html', posts=posts)
+
+@app.route('/political')
+def categoryp():
+	posts=Post.query.filter_by(category='Political').all()
+	return render_template('home.html', posts=posts)
+
+
+
 
 

@@ -6,6 +6,15 @@
           <div class="media-body">
             <div class="article-metadata">
               <a class="mr-2" href="#">{{ post.author.username }}</a>
+              {% if post.category=='Entertainment' %}
+                <a class="mr-2" href="{{url_for('categorye')}}">{{ post.category }}</a>
+              {% elif post.category == 'Music'%}
+                <a class="mr-2" href="{{url_for('categorym')}}">{{ post.category }}</a>
+              {% elif post.category == 'Political'%}  
+                <a class="mr-2" href="{{url_for('categoryp')}}">{{ post.category }}</a>
+              {% endif %}  
+                
+              
               <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
             </div>
             <h2><a class="article-title" href="{{ url_for('post',post_id=post.id ) }}">{{ post.title }}</a></h2>

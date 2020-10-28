@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from app.models import User
 
@@ -55,10 +55,11 @@ class UpdateAccountForm(FlaskForm):
 
 
 class PostForm(FlaskForm):
-	title = StringField('Title',
+        title = StringField('Title',
                            validators=[DataRequired(), Length(min=2, max=100)])
-	content= TextAreaField('content',validators=[DataRequired()])
-	submit = SubmitField('Post') 
+        content= TextAreaField('Content',validators=[DataRequired()])
+        category= SelectField('Categories',choices=[('Entertainment','Entertainment'),('Political','Political'), ('Music','Music')])
+        submit = SubmitField('Post') 
 
 class CheckPostForm(FlaskForm):
     submit = SubmitField('Predict') 
